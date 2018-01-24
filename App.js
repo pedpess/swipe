@@ -1,5 +1,5 @@
 import React from 'react';
-import RN from 'react-native';
+import RN, { SafeAreaView } from 'react-native';
 import { Card, Button } from 'react-native-elements';
 import Deck from './src/Deck';
 
@@ -19,6 +19,7 @@ export default class App extends React.Component {
   renderCard = cardItem => {
     return (
       <Card
+        key={cardItem.id}
         title={cardItem.text}
         image={{ uri: cardItem.uri }}
       >
@@ -36,12 +37,14 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <RN.View style={styles.container}>
-        <Deck
-          data={DATA}
-          renderCard={this.renderCard}
-        />
-      </RN.View>
+      <SafeAreaView style={{ flex: 1 }}>
+        <RN.View style={styles.container}>
+          <Deck
+            data={DATA}
+            renderCard={this.renderCard}
+          />
+        </RN.View>
+      </SafeAreaView>
     );
   }
 }
