@@ -1,5 +1,6 @@
 import React from 'react';
 import RN from 'react-native';
+import RNElements from 'react-native-elements';
 import Deck from './src/Deck';
 
 const DATA = [
@@ -17,7 +18,17 @@ export default class App extends React.Component {
 
   renderCard = cardItem => {
     return (
-      <RN.Text>{cardItem.text}</RN.Text>
+      <RNElements.Card
+        title={cardItem.text}
+        image={cardItem.uri}
+      >
+        <RN.Text style={{ marginBottom: 10 }}>Hello World</RN.Text>
+        <RNElements.Button
+          icon={{ name: 'code' }}
+          backgroundColor="#03A9A4"
+          title="View Now!"
+        />
+      </RNElements.Card>
     );
   }
 
