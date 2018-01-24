@@ -15,7 +15,7 @@ const DATA = [
 
 export default class App extends React.Component {
 
-  handleRenderCard = (cardItem) => {
+  renderCard = cardItem => {
     return (
       <RN.Text>{cardItem.text}</RN.Text>
     );
@@ -26,7 +26,7 @@ export default class App extends React.Component {
       <RN.View style={styles.container}>
         <Deck
           data={DATA}
-          renderCard={this.handleRenderCard}
+          renderCard={this.renderCard}
         />
       </RN.View>
     );
