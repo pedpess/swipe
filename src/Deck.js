@@ -11,7 +11,7 @@ export default class Deck extends React.Component {
 
     render() {
         return (
-            <RN.View>{this.renderCards()}</RN.View>
+            <RN.ScrollView>{this.renderCards()}</RN.ScrollView>
         );
     }
 }
