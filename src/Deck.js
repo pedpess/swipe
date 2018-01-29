@@ -12,11 +12,14 @@ export default class Deck extends React.Component {
             onPanResponderMove: (event, gestureState) => {
                 position.setValue({ x: gestureState.dx, y: gestureState.dy })
             },
-            onPanResponderRelease: () => { },
+            onPanResponderRelease: () => {
+                this.resetPosition();
+            },
         });
 
         this.state = { panResponder, position };
     }
+
 
     getCardStyle = () => {
         const { position } = this.state;
@@ -30,6 +33,14 @@ export default class Deck extends React.Component {
             ...position.getLayout(),
             transform: [{ rotate }]
         };
+    }
+
+    resetPosition = () => {
+        const { position } = this.state;
+
+        Animated.spring(position, {
+            toValue: { x: 0, y: 0 }
+        }).start();
     }
 
     renderCards = () => {
