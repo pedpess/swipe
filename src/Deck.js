@@ -18,20 +18,41 @@ export default class Deck extends React.Component {
         this.state = { panResponder, position };
     }
 
+    getCardStyle = () => {
+        const { position } = this.state;
+        const rotate = position.x.interpolate({
+            inputRange: [-500, 0, 500],
+            outputRange: ['-120deg', '0deg', '120deg']
+        });
+
+        return {
+            ...position.getLayout(),
+            transform: [{ rotate }]
+        };
+    }
+
     renderCards = () => {
-        return this.props.data.map(item => {
+        return this.props.data.map((item, index) => {
+            if (index === 0) {
+                return (
+                    <Animated.View
+                        key={item.id}
+                        {...this.state.panResponder.panHandlers}
+                        style={this.getCardStyle()}
+                    >
+                        {this.props.renderCard(item)}
+                    </Animated.View>
+                );
+            }
             return this.props.renderCard(item);
         });
     }
 
     render() {
         return (
-            <Animated.View
-                {...this.state.panResponder.panHandlers}
-                style={this.state.position.getLayout()}
-            >
+            <RN.View>
                 {this.renderCards()}
-            </Animated.View>
+            </RN.View>
         );
     }
 }
