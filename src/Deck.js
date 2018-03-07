@@ -3,8 +3,14 @@ import RN, { Animated } from 'react-native';
 
 const SCREEN_WIDTH = RN.Dimensions.get('window').width;
 const SWIPE_THRESHOLD = 0.25 * SCREEN_WIDTH;
+const SWIPE_OUT_DURATION = 250;
 
 export default class Deck extends React.Component {
+
+    static defaultProps = {
+        onSwipeRight: () => { },
+        onSwipeLeft: () => { },
+    }
 
     constructor(props) {
         super(props);
@@ -17,24 +23,33 @@ export default class Deck extends React.Component {
             },
             onPanResponderRelease: (event, gestureState) => {
                 if (gestureState.dx > SWIPE_THRESHOLD) {
-                    console.log('right');
+                    this.forceSwipe('right');
                 } else if (gestureState.dx < -SWIPE_THRESHOLD) {
-                    console.log('left');
+                    this.forceSwipe('left');
                 } else {
                     this.resetPosition();
                 }
             },
         });
 
-        this.state = { panResponder, position };
+        this.state = { panResponder, position, index: 0 };
     }
 
+    onSwipeComplete(direction) {
+        const { onSwipeLeft, onSwipeRight, data } = this.props;
+        const { position } = this.state;
+        const item = data[this.state.index];
 
+        direction === 'right' ? onSwipeRight(item) : onSwipeLeft(item);
+        position.setValue({ x: 0, y: 0 });
+        this.setState({ index: this.state.index + 1 });
+    }
+    
     getCardStyle = () => {
         const { position } = this.state;
         const rotate = position.x.interpolate({
             inputRange: [-SCREEN_WIDTH * 2, 0, SCREEN_WIDTH * 2],
-            outputRange: ['-120deg', '0deg', '120deg']
+            outputRange: ['-170deg', '0deg', '170deg']
         });
 
         return {
@@ -42,6 +57,15 @@ export default class Deck extends React.Component {
             transform: [{ rotate }]
         };
     }
+
+    forceSwipe(direction) {
+        const x = direction === 'right' ? SCREEN_WIDTH : -SCREEN_WIDTH;
+        Animated.timing(this.state.position, {
+            toValue: { x, y: 0 },
+            duration: SWIPE_OUT_DURATION,
+        }).start(() => this.onSwipeComplete(direction));
+    }
+
 
     resetPosition = () => {
         const { position } = this.state;
@@ -52,8 +76,10 @@ export default class Deck extends React.Component {
     }
 
     renderCards = () => {
-        return this.props.data.map((item, index) => {
-            if (index === 0) {
+        return this.props.data.map((item, itemIndex) => {
+            if (itemIndex < this.state.index) { return null; }
+
+            if (itemIndex === this.state.index) {
                 return (
                     <Animated.View
                         key={item.id}
@@ -64,6 +90,7 @@ export default class Deck extends React.Component {
                     </Animated.View>
                 );
             }
+
             return this.props.renderCard(item);
         });
     }
