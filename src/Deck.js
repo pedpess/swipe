@@ -76,23 +76,34 @@ export default class Deck extends React.Component {
     }
 
     renderCards = () => {
-        return this.props.data.map((item, itemIndex) => {
-            if (itemIndex < this.state.index) { return null; }
+        
+        if (this.state.index >= this.props.data.length) {
+            return this.props.renderNoMoreCards();
+        }
 
-            if (itemIndex === this.state.index) {
+        return this.props.data
+            .map((item, itemIndex) => {
+                if (itemIndex < this.state.index) { return null; }
+
+                if (itemIndex === this.state.index) {
+                    return (
+                        <Animated.View
+                            key={item.id}
+                            {...this.state.panResponder.panHandlers}
+                            style={[this.getCardStyle(), styles.cardStyle]}
+                        >
+                            {this.props.renderCard(item)}
+                        </Animated.View>
+                    );
+                }
+
                 return (
-                    <Animated.View
-                        key={item.id}
-                        {...this.state.panResponder.panHandlers}
-                        style={this.getCardStyle()}
-                    >
+                    <Animated.View key={item.id} style={styles.cardStyle}>
                         {this.props.renderCard(item)}
                     </Animated.View>
                 );
-            }
-
-            return this.props.renderCard(item);
-        });
+            })
+            .reverse();
     }
 
     render() {
@@ -103,3 +114,10 @@ export default class Deck extends React.Component {
         );
     }
 }
+
+const styles = {
+    cardStyle: {
+        position: 'absolute',
+        width: SCREEN_WIDTH,
+    }
+};

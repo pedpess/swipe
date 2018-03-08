@@ -35,6 +35,20 @@ export default class App extends React.Component {
     );
   }
 
+  renderNoMoreCards() {
+    return (
+        <Card title="All Done!">
+            <RN.Text style={{ marginBottom: 10 }}>
+                There's no more content here!
+            </RN.Text>
+            <Button
+                backgroundColor="#03A9F4"
+                title="Get more!"
+            />
+        </Card>
+    );
+}
+
   render() {
     return (
       <SafeAreaView style={{ flex: 1 }}>
@@ -42,6 +56,7 @@ export default class App extends React.Component {
           <Deck
             data={DATA}
             renderCard={this.renderCard}
+            renderNoMoreCards={this.renderNoMoreCards}
           />
         </RN.View>
       </SafeAreaView>
