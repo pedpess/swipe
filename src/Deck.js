@@ -1,5 +1,5 @@
 import React from 'react';
-import RN, { Animated } from 'react-native';
+import RN, { Animated, LayoutAnimation, UIManager } from 'react-native';
 
 const SCREEN_WIDTH = RN.Dimensions.get('window').width;
 const SWIPE_THRESHOLD = 0.25 * SCREEN_WIDTH;
@@ -19,7 +19,7 @@ export default class Deck extends React.Component {
         const panResponder = RN.PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onPanResponderMove: (event, gestureState) => {
-                position.setValue({ x: gestureState.dx, y: gestureState.dy })
+                position.setValue({ x: gestureState.dx, y: gestureState.dy });
             },
             onPanResponderRelease: (event, gestureState) => {
                 if (gestureState.dx > SWIPE_THRESHOLD) {
@@ -35,14 +35,27 @@ export default class Deck extends React.Component {
         this.state = { panResponder, position, index: 0 };
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.data !== this.props.data) {
+            this.setState({ index: 0 });
+        }
+    }
+
+    componentWillUpdate() {
+        UIManager.setLayoutAnimationEnabledExperimental 
+        && UIManager.setLayoutAnimationEnabledExperimental(true);
+        LayoutAnimation.spring();
+    }
+
     onSwipeComplete(direction) {
         const { onSwipeLeft, onSwipeRight, data } = this.props;
         const { position } = this.state;
         const item = data[this.state.index];
 
-        direction === 'right' ? onSwipeRight(item) : onSwipeLeft(item);
         position.setValue({ x: 0, y: 0 });
         this.setState({ index: this.state.index + 1 });
+
+        return direction === 'right' ? onSwipeRight(item) : onSwipeLeft(item);
     }
     
     getCardStyle = () => {
@@ -76,7 +89,6 @@ export default class Deck extends React.Component {
     }
 
     renderCards = () => {
-        
         if (this.state.index >= this.props.data.length) {
             return this.props.renderNoMoreCards();
         }
@@ -98,7 +110,10 @@ export default class Deck extends React.Component {
                 }
 
                 return (
-                    <Animated.View key={item.id} style={styles.cardStyle}>
+                    <Animated.View 
+                        key={item.id} 
+                        style={[styles.cardStyle, { top: 10 * (itemIndex - this.state.index) }]}
+                    >
                         {this.props.renderCard(item)}
                     </Animated.View>
                 );
